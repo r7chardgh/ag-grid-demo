@@ -24,3 +24,14 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+.rag-red {
+    background-color: #d9543044;
+}
+.rag-blue {
+    background-color: #307fd944;
+}
+.rag-green {
+    background-color: #30d9a144;
+}

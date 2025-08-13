@@ -5,7 +5,18 @@ import { AgGridReact } from 'ag-grid-react'
 import { useCallback, useEffect, useState } from 'react'
 import usePaginationStore from '@/lib/store/paginationStore';
 import { getDummyUsersByLimit } from '@/lib/serverActions';
+import Image from 'next/image';
 ModuleRegistry.registerModules([AllCommunityModule]);
+
+//user image
+
+const UserImage = (params: any) => {
+    if (params.value) {
+        return <Image width={50} height={50} src={params.value} alt={'user image'} />
+    } else {
+        return null
+    }
+}
 
 const UsersGrid = () => {
     const { page, limit, totalRows, setPage, setLimit, setTotalRows } = usePaginationStore();
@@ -13,26 +24,33 @@ const UsersGrid = () => {
 
 
     const colDefs: ColDef<IUser>[] = [
-        { headerName: 'ID', field: 'id', sortable: true, filter: true },
-        { headerName: 'Username', field: 'username', sortable: true, filter: true },
-        { headerName: 'Role', field: 'role', sortable: true, filter: true },
+        { headerName: 'Image', field: 'image', sortable: true, filter: true, cellRenderer: UserImage, flex: 1 },
+        { headerName: 'Username', field: 'username', sortable: true, filter: true, flex: 1 },
+        {
+            headerName: 'Role', field: 'role', sortable: true, filter: true
+            , cellClassRules: {
+                'rag-red': params => params.value === 'admin',
+                'rag-blue': params => params.value === 'user',
+                'rag-green': params => params.value === 'moderator',
+            }, flex: 1
+        },
         {
             headerName: 'Crypto Coin',
             field: 'crypto.coin',
             sortable: true,
-            filter: true,
+            filter: true, flex: 1
         },
         {
             headerName: 'Crypto Wallet',
             field: 'crypto.wallet',
             sortable: true,
-            filter: true,
+            filter: true, flex: 2
         },
         {
             headerName: 'Crypto Network',
             field: 'crypto.network',
             sortable: true,
-            filter: true,
+            filter: true, flex: 1
         },
     ];
 
@@ -92,6 +110,7 @@ const UsersGrid = () => {
         <div>
             <div className="ag-theme-alpine" style={{ height: 400, width: '100%' }}>
                 <AgGridReact
+                    rowHeight={50}
                     columnDefs={colDefs}
                     rowModelType="infinite"
                     pagination={true}
