@@ -2,11 +2,28 @@
 import { IUser } from '@/lib/definition';
 import { AllCommunityModule, ColDef, GridApi, GridReadyEvent, IDatasource, IGetRowsParams, IServerSideDatasource, ModuleRegistry, PaginationChangedEvent } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import usePaginationStore from '@/lib/store/paginationStore';
 import { getDummyUsersByLimit } from '@/lib/serverActions';
 import Image from 'next/image';
 ModuleRegistry.registerModules([AllCommunityModule]);
+
+//theme
+import { themeQuartz } from "ag-grid-community"; // or themeBalham, themeAlpine
+
+const myTheme = themeQuartz.withParams({
+    /* Low spacing = very compact */
+    spacing: 4,
+    /* Changes the colour of the grid text */
+    foregroundColor: 'rgb(14, 68, 145)',
+    /* Changes the colour of the grid background */
+    backgroundColor: 'rgb(241, 247, 255)',
+    /* Changes the header colour of the top row */
+    headerBackgroundColor: 'rgb(228, 237, 250)',
+    /* Changes the hover colour of the row*/
+    rowHoverColor: 'rgb(216, 226, 255)',
+});
+
 
 //user image
 
@@ -24,34 +41,24 @@ const UsersGrid = () => {
 
 
     const colDefs: ColDef<IUser>[] = [
-        { headerName: 'Image', field: 'image', sortable: true, filter: true, cellRenderer: UserImage, flex: 1 },
-        { headerName: 'Username', field: 'username', sortable: true, filter: true, flex: 1 },
+        { headerName: 'User Icon', field: 'image', cellRenderer: UserImage, flex: 1 },
+        { headerName: 'Username', field: 'username', flex: 1 },
         {
-            headerName: 'Role', field: 'role', sortable: true, filter: true
+            headerName: 'Role', field: 'role'
             , cellClassRules: {
                 'rag-red': params => params.value === 'admin',
                 'rag-blue': params => params.value === 'user',
                 'rag-green': params => params.value === 'moderator',
-            }, flex: 1
+            }, flex: 1,
+            editable: true,
+            cellEditor: 'agSelectCellEditor',
+            cellEditorParams: {
+                values: ['user', 'admin', 'moderator'],
+            },
         },
         {
-            headerName: 'Crypto Coin',
-            field: 'crypto.coin',
-            sortable: true,
-            filter: true, flex: 1
-        },
-        {
-            headerName: 'Crypto Wallet',
-            field: 'crypto.wallet',
-            sortable: true,
-            filter: true, flex: 2
-        },
-        {
-            headerName: 'Crypto Network',
-            field: 'crypto.network',
-            sortable: true,
-            filter: true, flex: 1
-        },
+            headerName: 'Living Country', field: 'address.country', flex: 1
+        }
     ];
 
     const onPaginationChanged = useCallback((event: PaginationChangedEvent) => {
@@ -107,9 +114,12 @@ const UsersGrid = () => {
     // };
 
     return (
-        <div>
+        <div className='flex gap-4 flex-col'>
+            <h3>Infinite row mode: (for large data)</h3>
+            <p className='p-1 px-2 rounded-sm bg-sky-300 text-sky-950'>Role is editable, double click to test it</p>
             <div className="ag-theme-alpine" style={{ height: 400, width: '100%' }}>
                 <AgGridReact
+                    theme={myTheme}
                     rowHeight={50}
                     columnDefs={colDefs}
                     rowModelType="infinite"
