@@ -11,21 +11,21 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 //theme
 import { themeQuartz } from "ag-grid-community"; // or themeBalham, themeAlpine
 
-const myTheme = themeQuartz.withParams({
-    /* Low spacing = very compact */
-    spacing: 4,
-    /* Changes the colour of the grid text */
-    foregroundColor: 'rgb(14, 68, 145)',
-    /* Changes the colour of the grid background */
-    backgroundColor: 'rgb(241, 247, 255)',
-    /* Changes the header colour of the top row */
-    headerBackgroundColor: 'rgb(228, 237, 250)',
-    /* Changes the hover colour of the row*/
-    rowHoverColor: 'rgb(216, 226, 255)',
-});
+const myTheme = themeQuartz
+    .withParams({
+        backgroundColor: "#1f2836",
+        browserColorScheme: "dark",
+        chromeBackgroundColor: {
+            ref: "foregroundColor",
+            mix: 0.07,
+            onto: "backgroundColor"
+        },
+        foregroundColor: "#FFF",
+        headerFontSize: 14
+    });
 
 
-//user image
+//user image cell component
 
 const UserImage = (params: any) => {
     if (params.value) {
@@ -41,24 +41,36 @@ const UsersGrid = () => {
 
 
     const colDefs: ColDef<IUser>[] = [
-        { headerName: 'User Icon', field: 'image', cellRenderer: UserImage, flex: 1 },
-        { headerName: 'Username', field: 'username', flex: 1 },
+        { headerName: 'User Icon', field: 'image', cellRenderer: UserImage, flex: 1, sortable: false, minWidth: 100 },
+        { headerName: 'Username', field: 'username', flex: 1, sortable: false, minWidth: 100 },
         {
-            headerName: 'Role', field: 'role'
-            , cellClassRules: {
-                'rag-red': params => params.value === 'admin',
+            headerName: 'Role',
+            field: 'role',
+            cellClassRules: {
+                'rag-yellow': params => params.value === 'admin',
                 'rag-blue': params => params.value === 'user',
                 'rag-green': params => params.value === 'moderator',
-            }, flex: 1,
+            },
+            flex: 1,
             editable: true,
             cellEditor: 'agSelectCellEditor',
             cellEditorParams: {
                 values: ['user', 'admin', 'moderator'],
             },
+            sortable: false, minWidth: 100
         },
         {
-            headerName: 'Living Country', field: 'address.country', flex: 1
-        }
+            headerName: 'Living City', field: 'address.city', flex: 2, sortable: false, minWidth: 100
+        },
+        {
+            headerName: 'Blood Type', field: 'bloodGroup', flex: 1, sortable: false,
+            editable: true,
+            cellEditor: 'agSelectCellEditor',
+            cellEditorParams: {
+                values: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+            },
+            minWidth: 100
+        },
     ];
 
     const onPaginationChanged = useCallback((event: PaginationChangedEvent) => {
@@ -116,7 +128,7 @@ const UsersGrid = () => {
     return (
         <div className='flex gap-4 flex-col'>
             <h3>Infinite row mode: (for large data)</h3>
-            <p className='p-1 px-2 rounded-sm bg-sky-300 text-sky-950'>Role is editable, double click to test it</p>
+            <p className='p-1 px-2 rounded-sm bg-sky-300 text-sky-950'>[Role, Blood Type] are editable, double click to test it</p>
             <div className="ag-theme-alpine" style={{ height: 400, width: '100%' }}>
                 <AgGridReact
                     theme={myTheme}
@@ -129,6 +141,7 @@ const UsersGrid = () => {
                     onGridReady={onGridReady}
                     onPaginationChanged={onPaginationChanged}
                     paginationPageSizeSelector={[10, 30, 60]}
+                    rowClassRules={{ 'rag-purple': params => params.data?.bloodGroup === 'AB-' }}
                 />
             </div>
             {/* <div style={{ marginTop: 10 }}>
