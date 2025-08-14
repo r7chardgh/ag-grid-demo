@@ -12,6 +12,7 @@
 4. add editable boolean, remove sortable & filter for 'infinite' row mode type grid
 5. add css for Mobile Device Pagination Bar Rendering Issue
 6. add themeQuartz
+7. add one more case - client side row mode
 
 ## remarks
 1. ag-grid has enterprise feature - support server side row model (SSRM) (lazy loading from server insteads of load all data to client)
